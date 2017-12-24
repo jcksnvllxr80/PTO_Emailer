@@ -26,12 +26,21 @@ namespace PTO_Emailer
             xmlFileDialog.InitialDirectory = Properties.Settings.Default.InitialPath;
 
             if (xmlFileDialog.ShowDialog() == true)
+            {
                 if (Properties.Settings.Default.IsFirstRun)
                 {
-                    SetDefaultFolderPath(Path.GetDirectoryName(xmlFileDialog.FileName));
+                    string fileDirectory = Path.GetDirectoryName(xmlFileDialog.FileName);
+                    MessageBoxResult dialogResult = MessageBox.Show("Would you like to set " +
+                        fileDirectory + " as the default directory when locating the vacation XML file?",
+                        "Set Default XML Directory?", MessageBoxButton.YesNo);
+                    if (dialogResult == MessageBoxResult.Yes)
+                    {
+                        Properties.Settings.Default.InitialPath = fileDirectory;
+                    }
                     Properties.Settings.Default.IsFirstRun = false;
                 }
                 CheckFileType(xmlFileDialog.FileName);
+            }
         }
 
         private void CloseWindow(object sender, RoutedEventArgs e)
@@ -63,7 +72,6 @@ namespace PTO_Emailer
             else
             {
                 MessageBox.Show("Not a valid filetype. Please try again.");
-                
                 return;
             }
                 
@@ -73,21 +81,9 @@ namespace PTO_Emailer
         private void ReadVacationXML(string file)
         {
             Console.WriteLine(file + " is now being read.");
-        }
-
-        private void SetDefaultFolderPath(string path)
-        {
-            MessageBoxResult dialogResult = MessageBox.Show("Would you like to set " + 
-                path + " as the default directory when locating the vacation XML file?", 
-                "Set Default XML Directory?", MessageBoxButton.YesNo);
-            if (dialogResult == MessageBoxResult.Yes)
-            {
-                Properties.Settings.Default.InitialPath = path;
-            }
-            else if (dialogResult == MessageBoxResult.No)
-            {
-                //do something else
-            }
+            //use threading to handle reading the file.
+            //use the progress bar and status bar to inform the user 
+            //of the current process and its completion percentage.
         }
 
         private void BrowseForFolder(object sender, RoutedEventArgs e)
@@ -97,9 +93,9 @@ namespace PTO_Emailer
             folderBrowser.Title = "Select default browsing directory";
 
             var result = folderBrowser.ShowDialog();          
-            if (! result.Value)
+            if (result.Value != false)
             {
-                SetDefaultFolderPath(result.Value.ToString());
+                Properties.Settings.Default.InitialPath = folderBrowser.FileName;
             }
         }
 
