@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
+using System.Xml;
 using MahApps.Metro.Controls;
 using Microsoft.Win32;
 using WPFFolderBrowser;
@@ -16,6 +18,7 @@ namespace PTO_Emailer
         {
             InitializeComponent();
         }
+
 
         private void SelectFile(object sender, RoutedEventArgs e)
         {
@@ -43,10 +46,12 @@ namespace PTO_Emailer
             }
         }
 
+
         private void CloseWindow(object sender, RoutedEventArgs e)
         {
             Close();
         }
+
 
         private void MetroWindow_Drop(object sender, DragEventArgs e)
         {
@@ -57,6 +62,7 @@ namespace PTO_Emailer
                 CheckFileType(file[0]);              
             }
         }
+
 
         private void CheckFileType(string file)
         {
@@ -78,13 +84,24 @@ namespace PTO_Emailer
             ReadVacationXML(file);
         }
 
+
         private void ReadVacationXML(string file)
         {
             Console.WriteLine(file + " is now being read.");
+            File.WriteAllText(file, Regex.Replace(File.ReadAllText(file), "&", ""));
+            XmlTextReader reader = new XmlTextReader(file);
+            while (reader.Read())
+            {
+                if (reader.HasValue)
+                {
+                    Console.WriteLine(reader.Value);
+                }
+            }
             //use threading to handle reading the file.
             //use the progress bar and status bar to inform the user 
             //of the current process and its completion percentage.
         }
+
 
         private void BrowseForFolder(object sender, RoutedEventArgs e)
         {
