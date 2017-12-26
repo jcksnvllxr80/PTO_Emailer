@@ -1,14 +1,18 @@
 ﻿<Controls:MetroWindow x:Class="PTO_Emailer.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:local="clr-namespace:PTO_Emailer"
-        mc:Ignorable="d"
-        AllowDrop="True"
-        Drop="MetroWindow_Drop"
-        Title="MainWindow" Height="350" Width="525">
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:local="clr-namespace:PTO_Emailer"
+                      mc:Ignorable="d"
+                      AllowDrop="True"
+                      Drop="MetroWindow_Drop"
+                      Title="MainWindow" 
+                      Height="350"
+                      MinHeight="200"
+                      Width="525"
+                      MinWidth="450">
     <Grid x:Name="FormGrid" 
           Background="DarkGray">
         <Grid.RowDefinitions>
@@ -62,13 +66,51 @@
                               Grid.RowSpan="25"
                               Grid.ColumnSpan="3">
                     <Grid x:Name="CreateMailTabGrid">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="15" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="15" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="15" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="EmployeeComboBox"
+                                  Grid.Row="1"
+                                  Grid.Column="1"
+                                  Grid.ColumnSpan="2"
+                                  VerticalAlignment="Top"
+                                  HorizontalAlignment="Left"
+                                  Width="200"
+                                  Tag="Select employee." 
+                                  MouseEnter="EmployeeComboBox_MouseEnter" 
+                                  MouseLeave="EmployeeComboBox_MouseLeave"
+                                  Visibility="Collapsed"/>
+                        <Button x:Name="MailButton"
+                                Grid.Row="1"
+                                Grid.Column="3"
+                                Grid.ColumnSpan="2"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Center"
+                                Width="80"
+                                Content="Mail"
+                                Tag="Create email." 
+                                MouseEnter="MailButton_MouseEnter" 
+                                MouseLeave="MailButton_MouseLeave" 
+                                Click="MailButton_Click"
+                                Visibility="Collapsed"/>
                     </Grid>
                 </ScrollViewer>
             </TabItem>
             <TabItem x:Name="FutureUseTab" 
-                Header="Future" 
-                Tag="Do something in the future" 
-                Visibility="Collapsed"/>
+                     Header="Future" 
+                     Tag="Do something in the future" 
+                     Visibility="Collapsed"/>
         </TabControl>
         <StatusBar Grid.Row="5"
                 Grid.Column="0"
