@@ -8,11 +8,13 @@
                       mc:Ignorable="d"
                       AllowDrop="True"
                       Drop="MetroWindow_Drop"
-                      Title="MainWindow" 
+                      Title="Vacation Email Creator" 
                       Height="350"
                       MinHeight="200"
                       Width="525"
-                      MinWidth="450">
+                      MinWidth="450"
+                      AllowsTransparency="True"
+                      Opacity="0.94">
     <Grid x:Name="FormGrid" 
           Background="DarkGray">
         <Grid.RowDefinitions>
