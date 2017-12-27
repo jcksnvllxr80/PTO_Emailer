@@ -12,6 +12,8 @@ using Microsoft.Office.Interop.Outlook;
 using OutlookApp = Microsoft.Office.Interop.Outlook.Application;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.ComponentModel;
+using System.Threading;
 
 namespace PTO_Emailer
 {
@@ -21,14 +23,26 @@ namespace PTO_Emailer
     public partial class MainWindow : MetroWindow
     {
         ArrayList employees = new ArrayList();
+        private System.ComponentModel.BackgroundWorker emailsBackgroundWorker = new BackgroundWorker();
+        string applicationMessage = "";
 
         public MainWindow()
         {
             InitializeComponent();
+            InitializeBackgroundWorker();
         }
 
 
-        private void SelectFile(object sender, RoutedEventArgs e)
+        private void InitializeBackgroundWorker()
+        {
+            emailsBackgroundWorker.WorkerReportsProgress = true;
+            emailsBackgroundWorker.DoWork += new DoWorkEventHandler(EmailsBackgroundWorker_DoWork);
+            emailsBackgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(EmailsBackgroundWorker_RunWorkerCompleted);
+            emailsBackgroundWorker.ProgressChanged += new ProgressChangedEventHandler(EmailsBackgroundWorker_ProgressChanged);
+        }
+
+
+            private void SelectFile(object sender, RoutedEventArgs e)
         {
             OpenFileDialog xmlFileDialog = new OpenFileDialog();
             xmlFileDialog.Filter = "XML files (*.xml)|*.xml|XLS files(*.xls)| *.xls";
@@ -145,13 +159,13 @@ namespace PTO_Emailer
             {
                 if (XmlParser.IsAttributeName(row.Attributes, "ss:Height", "10.99"))
                 {
-                    if (emp.Name.Equals(""))
+                    if (emp.FullName.Equals(""))
                     {
-                        emp.Name = XmlParser.FindRowColData(row, "4");
+                        emp.FullName = XmlParser.FindRowColData(row, "4");
                     }
                 }
 
-                if (!emp.Name.Equals(""))
+                if (!emp.FullName.Equals(""))
                 {
                     if (!balanceColumn.Equals(""))
                     {
@@ -163,7 +177,7 @@ namespace PTO_Emailer
                         {
                             emp.Sick = ConvertData(XmlParser.FindRowColData(row, balanceColumn));
                         }
-                        if (!emp.Name.Equals("") && !emp.Vacation.Equals("") && !emp.Sick.Equals(""))
+                        if (!emp.FullName.Equals("") && !emp.Vacation.Equals("") && !emp.Sick.Equals(""))
                         {
                             employees.Add(emp);
                             Console.WriteLine(emp.ToString() + "\r\n");
@@ -234,7 +248,7 @@ namespace PTO_Emailer
 
             foreach (EmployeeData employee in employees)
             {
-                EmployeeComboBox.Items.Add(employee.Name);
+                EmployeeComboBox.Items.Add(employee.FullName);
             }
         }
 
@@ -261,7 +275,7 @@ namespace PTO_Emailer
 
         private void EmployeeComboBox_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            StatusLabel.Text = "";
+            StatusLabel.Text = applicationMessage;
         }
 
 
@@ -273,7 +287,7 @@ namespace PTO_Emailer
 
         private void MailButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            StatusLabel.Text = "";
+            StatusLabel.Text = applicationMessage;
         }
 
 
@@ -282,18 +296,22 @@ namespace PTO_Emailer
             Console.WriteLine(EmployeeComboBox.SelectedItem.ToString());
             if (EmployeeComboBox.SelectedItem.ToString().Equals("System.Windows.Controls.ComboBoxItem: All Employees"))
             {
-                foreach (EmployeeData employee in employees)
-                {
-                    CreateEmail(employee.Name, employee.Vacation, employee.Sick);
-                }
+                applicationMessage = "Creating Mail Items...";
+                EmployeeComboBox.IsEnabled = false;
+                MailButton.IsEnabled = false;
+                DefaultDirectoryMenuItem.IsEnabled = false;
+
+                ProgressBar.Visibility = Visibility.Visible;
+                TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                emailsBackgroundWorker.RunWorkerAsync();
             }
             else
             {
                 foreach (EmployeeData employee in employees)
                 {
-                    if (EmployeeComboBox.SelectedItem.ToString().Equals(employee.Name))
+                    if (EmployeeComboBox.SelectedItem.ToString().Equals(employee.FullName))
                     {
-                        CreateEmail(employee.Name, employee.Vacation, employee.Sick);
+                        CreateEmail(employee);
                         break;
                     }
                 }
@@ -302,14 +320,52 @@ namespace PTO_Emailer
         }
 
 
-        private void CreateEmail(string recipient, string vacation, string sick)
+        private void EmailsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            string[] empName = recipient.Split(',');
-            
-            string bodyStr = "Dear " + empName[1] + "," + "\r\n" +
-                "\r\n" + "Your current vacation balance is " + vacation + " hours." +
-                "\r\n" + "Your current sick balance is " + sick + " hours.";
-            string TO_Recipients = recipient;
+            int i = 1;
+            int empCount = employees.Count;
+            foreach (EmployeeData employee in employees)
+            {
+                //Thread.Sleep(200); //simulating work for testing purposes
+                CreateEmail(employee);
+                if (i % 10 == 0)
+                {
+                    MessageBox.Show("Currently working on emails for employees " + (i - 9) + " through " + i + ".");
+
+                }
+                i++;
+                emailsBackgroundWorker.ReportProgress((int)((double)i / (double)empCount * 100));
+            }
+        }
+
+
+        private void EmailsBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            ProgressBar.Value = e.ProgressPercentage;
+            TaskbarItemInfo.ProgressValue = (double)(e.ProgressPercentage)/ 100;
+        }
+
+
+        private void EmailsBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            EmployeeComboBox.IsEnabled = true;
+            MailButton.IsEnabled = true;
+            OpenMenuItem.IsEnabled = true;
+            DefaultDirectoryMenuItem.IsEnabled = true;
+
+            ProgressBar.Value = 100;
+            ProgressBar.Visibility = Visibility.Hidden;
+            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+            applicationMessage = "";
+        }
+
+
+        private void CreateEmail(EmployeeData employee)
+        {
+            string bodyStr = "Dear " + employee.FirstName + "," + "\r\n" +
+                "\r\n" + "Your current vacation balance is " + employee.Vacation + " hours." +
+                "\r\n" + "Your current sick balance is " + employee.Sick + " hours.";
+            string TO_Recipients = employee.FullName;
             string CC_Recipients = "";
             string subjectStr = "Your Current Vacation Balance";
 

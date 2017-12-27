@@ -5,6 +5,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:PTO_Emailer"
+                      Icon="Mail.ico"
                       mc:Ignorable="d"
                       AllowDrop="True"
                       Drop="MetroWindow_Drop"
@@ -15,6 +16,9 @@
                       MinWidth="450"
                       AllowsTransparency="True"
                       Opacity="0.94">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo/>
+    </Window.TaskbarItemInfo>
     <Grid x:Name="FormGrid" 
           Background="DarkGray">
         <Grid.RowDefinitions>

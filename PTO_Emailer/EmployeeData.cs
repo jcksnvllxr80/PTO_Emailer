@@ -3,14 +3,16 @@
     class EmployeeData
     {
         private string EmployeeName;
+        private string EmployeeFirstName;
+        private string EmployeeLastName;
         private string VacationTime;
         private string SickTime;
 
         public EmployeeData()
         {
-            this.EmployeeName = "";
-            this.VacationTime = "";
-            this.SickTime = "";
+            EmployeeName = "";
+            VacationTime = "";
+            SickTime = "";
         }
 
 
@@ -22,7 +24,7 @@
         }
 
 
-        public string Name
+        public string FullName
         {
             get
             {
@@ -30,7 +32,41 @@
             }
             set
             {
-                EmployeeName = value;
+                string[] empName = value.Split(',');
+                try
+                {
+                    if (empName[1].Contains("quot;"))
+                    {
+                        empName[1] = empName[1].Replace("quot;", "\"");
+                    }
+                    EmployeeFirstName = empName[1];
+                    EmployeeLastName = empName[0];
+                    EmployeeName = EmployeeLastName + ", " + EmployeeFirstName;
+                }
+                catch
+                {
+                    EmployeeFirstName = "Problem";
+                    EmployeeLastName = "Parsing";
+                    EmployeeName = "Problem Parsing";
+                }
+            }
+        }
+
+
+        public string FirstName
+        {
+            get
+            {
+                return EmployeeFirstName;
+            }
+        }
+
+
+        public string LastName
+        {
+            get
+            {
+                return EmployeeLastName;
             }
         }
 
