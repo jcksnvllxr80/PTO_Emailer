@@ -10,6 +10,8 @@ using WPFFolderBrowser;
 
 using Microsoft.Office.Interop.Outlook;
 using OutlookApp = Microsoft.Office.Interop.Outlook.Application;
+using System.Text.RegularExpressions;
+using System.Text;
 
 namespace PTO_Emailer
 {
@@ -90,9 +92,33 @@ namespace PTO_Emailer
             employees.Clear();
             EmployeeComboBox.Items.Clear();
 
+            CheckFileForErroneousData(file);
             ReadVacationXML(file);
             BindEmployeeDataToComboBox();
             EnableControls();
+        }
+
+
+        private void CheckFileForErroneousData(string file)
+        {
+            ArrayList newLines = new ArrayList();
+
+            string[] lines = File.ReadAllLines(file);
+            File.Delete(file);
+            foreach (string line in lines)
+            {
+                newLines.Add(Regex.Replace(line, "&", "", RegexOptions.Compiled));
+            }
+
+            using (FileStream fs = File.Create(file))
+            {
+                foreach (string newLine in newLines)
+                {
+                    Byte[] info = new UTF8Encoding(true).GetBytes(newLine);
+                    // Add some information to the file.
+                    fs.Write(info, 0, info.Length);
+                }
+            }
         }
 
 
