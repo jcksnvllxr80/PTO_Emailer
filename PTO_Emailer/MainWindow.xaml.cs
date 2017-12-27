@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Text;
 using System.ComponentModel;
 using System.Threading;
+using System.Windows.Data;
 
 namespace PTO_Emailer
 {
@@ -26,10 +27,20 @@ namespace PTO_Emailer
         private System.ComponentModel.BackgroundWorker emailsBackgroundWorker = new BackgroundWorker();
         string applicationMessage = "";
 
+
+        public struct EmployeeDataStruct
+        {
+            public string Name { set; get; }
+            public string Vaca { set; get; }
+            public string Sick { set; get; }
+        }
+
+
         public MainWindow()
         {
             InitializeComponent();
             InitializeBackgroundWorker();
+            InitializeDatagrid();
         }
 
 
@@ -42,7 +53,24 @@ namespace PTO_Emailer
         }
 
 
-            private void SelectFile(object sender, RoutedEventArgs e)
+        private void InitializeDatagrid()
+        {
+            DataGridTextColumn NameCol = new DataGridTextColumn();
+            DataGridTextColumn VacaCol = new DataGridTextColumn();
+            DataGridTextColumn SickCol = new DataGridTextColumn();
+            EmployeeDataGrid.Columns.Add(NameCol);
+            EmployeeDataGrid.Columns.Add(VacaCol);
+            EmployeeDataGrid.Columns.Add(SickCol);
+            NameCol.Binding = new Binding("Name");
+            VacaCol.Binding = new Binding("Vaca");
+            SickCol.Binding = new Binding("Sick");
+            NameCol.Header = "EmployeeName";
+            VacaCol.Header = "Vacation";
+            SickCol.Header = "Sick";
+        }
+
+
+        private void SelectFile(object sender, RoutedEventArgs e)
         {
             OpenFileDialog xmlFileDialog = new OpenFileDialog();
             xmlFileDialog.Filter = "XML files (*.xml)|*.xml|XLS files(*.xls)| *.xls";
@@ -104,11 +132,13 @@ namespace PTO_Emailer
             }
             //clear any old data
             employees.Clear();
+            EmployeeDataGrid.Items.Clear();
             EmployeeComboBox.Items.Clear();
 
             CheckFileForErroneousData(file);
             ReadVacationXML(file);
             BindEmployeeDataToComboBox();
+            BindEmployeeDataToGrid();
             EnableControls();
         }
 
@@ -141,6 +171,7 @@ namespace PTO_Emailer
             CreateMailingsTab.Visibility = Visibility.Visible;
             MailButton.Visibility = Visibility.Visible;
             EmployeeComboBox.Visibility = Visibility.Visible;
+            EmployeesDataTab.Visibility = Visibility.Visible;
         }
 
 
@@ -252,6 +283,19 @@ namespace PTO_Emailer
             }
         }
 
+        private void BindEmployeeDataToGrid()
+        {
+            foreach (EmployeeData employee in employees)
+            {
+                EmployeeDataGrid.Items.Add(new EmployeeDataStruct
+                {
+                    Name = employee.FullName,
+                    Vaca = employee.Vacation,
+                    Sick = employee.Sick
+                });
+            }
+        }
+
 
         private void BrowseForFolder(object sender, RoutedEventArgs e)
         {
@@ -326,12 +370,12 @@ namespace PTO_Emailer
             int empCount = employees.Count;
             foreach (EmployeeData employee in employees)
             {
-                //Thread.Sleep(200); //simulating work for testing purposes
+                //Thread.Sleep(100); //simulating work for testing purposes
                 CreateEmail(employee);
                 if (i % 10 == 0)
                 {
-                    MessageBox.Show("Currently working on emails for employees " + (i - 9) + " through " + i + ".");
-
+                    MessageBox.Show("Currently working on emails for employees " + (i - 9) + 
+                        " through " + i + " out of " + empCount + " total.");
                 }
                 i++;
                 emailsBackgroundWorker.ReportProgress((int)((double)i / (double)empCount * 100));

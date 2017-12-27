@@ -64,7 +64,6 @@
             </TabControl.Resources>
             <TabItem x:Name="CreateMailingsTab" 
                      Header="Mailings" 
-                     Tag="Create email(s)" 
                      Visibility="Collapsed">
                 <ScrollViewer VerticalScrollBarVisibility="Visible"
                               Grid.Row="4"
@@ -113,10 +112,16 @@
                     </Grid>
                 </ScrollViewer>
             </TabItem>
-            <TabItem x:Name="FutureUseTab" 
-                     Header="Future" 
-                     Tag="Do something in the future" 
-                     Visibility="Collapsed"/>
+            <TabItem x:Name="EmployeesDataTab" 
+                     Header="Table" 
+                     Visibility="Collapsed">
+                <Grid x:Name="EmployeeTabGrid">
+                    <DataGrid Name="EmployeeDataGrid" 
+                              IsReadOnly="True" 
+                              AutoGenerateColumns="False" >
+                    </DataGrid>
+                </Grid>
+            </TabItem>
         </TabControl>
         <StatusBar Grid.Row="5"
                 Grid.Column="0"
