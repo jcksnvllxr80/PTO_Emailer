@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTO_Emailer", "PTO_Emailer\PTO_Emailer.csproj", "{14DA584F-24EB-408C-B5F9-E0AD74D37D9E}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "PTO_EmailerSetup", "PTO_EmailerSetup\PTO_EmailerSetup.vdproj", "{B9E49524-091B-45B7-ABA4-119A9881AA08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,8 @@ Global
 		{14DA584F-24EB-408C-B5F9-E0AD74D37D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14DA584F-24EB-408C-B5F9-E0AD74D37D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14DA584F-24EB-408C-B5F9-E0AD74D37D9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9E49524-091B-45B7-ABA4-119A9881AA08}.Debug|Any CPU.ActiveCfg = Debug
+		{B9E49524-091B-45B7-ABA4-119A9881AA08}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
