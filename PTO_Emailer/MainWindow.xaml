@@ -105,6 +105,24 @@
                                   MouseEnter="EmployeeComboBox_MouseEnter" 
                                   MouseLeave="EmployeeComboBox_MouseLeave"
                                   Visibility="Collapsed"/>
+                        <StackPanel Grid.Row="2"
+                                    Grid.Column="1"
+                                    Grid.ColumnSpan="2"
+                                    Orientation="Horizontal">
+                            <Label Content="Start Number" />
+                            <TextBox x:Name="StartNumberTextBox"
+                                     Grid.Row="2"
+                                     Grid.Column="1"
+                                     VerticalAlignment="Top"
+                                     HorizontalAlignment="Left"
+                                     Width="50"
+                                     Text="1"
+                                     Visibility="Collapsed" 
+                                     Tag="Enter number to start emails with."
+                                     MouseEnter="StartNumberTextBox_MouseEnter" 
+                                     MouseLeave="StartNumberTextBox_MouseLeave" 
+                                     PreviewKeyDown="StartNumberTextBox_PreviewKeyDown" LostKeyboardFocus="StartNumberTextBox_LostKeyboardFocus"/>
+                        </StackPanel>
                         <Button x:Name="MailButton"
                                 Grid.Row="1"
                                 Grid.Column="3"

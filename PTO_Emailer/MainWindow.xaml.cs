@@ -15,6 +15,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace PTO_Emailer
 {
@@ -26,6 +27,7 @@ namespace PTO_Emailer
         ArrayList employees = new ArrayList();
         private System.ComponentModel.BackgroundWorker emailsBackgroundWorker = new BackgroundWorker();
         string applicationMessage = "";
+        int StartNumber = 1;
 
 
         public MainWindow()
@@ -183,6 +185,8 @@ namespace PTO_Emailer
         {
             CreateMailingsTab.Visibility = Visibility.Visible;
             CreateMailingsTab.IsSelected = true;
+
+            StartNumberTextBox.Visibility = Visibility.Visible;
             MailButton.Visibility = Visibility.Visible;
             EmployeeComboBox.Visibility = Visibility.Visible;
             EmployeesDataTab.Visibility = Visibility.Visible;
@@ -342,6 +346,59 @@ namespace PTO_Emailer
         }
 
 
+        private void StartNumberTextBox_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            StatusLabel.Text = StartNumberTextBox.Tag.ToString();
+        }
+
+
+        private void StartNumberTextBox_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            StatusLabel.Text = applicationMessage;
+        }
+
+
+        private void StartNumberTextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Tab)
+            {
+                StartNumber = ValidateStartNum(StartNumberTextBox.Text);
+                StartNumberTextBox.Text = StartNumber.ToString();
+            }
+        }
+
+
+        private void StartNumberTextBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            StartNumber = ValidateStartNum(StartNumberTextBox.Text);
+            StartNumberTextBox.Text = StartNumber.ToString();
+        }
+
+
+        private int ValidateStartNum(string text)
+        {
+            int startInt = 1;
+            try
+            {
+                startInt = int.Parse(text);
+            }
+            catch
+            {
+                MessageBox.Show("Please enter a number.");
+                return 1;
+            }
+
+            if (startInt < 1)
+            {
+                startInt = 1;
+            }
+            else if (startInt > employees.Count)
+            {
+                startInt = employees.Count;
+            }
+            return startInt;
+        }
+
         private void MailButton_Click(object sender, RoutedEventArgs e)
         {
             Console.WriteLine(EmployeeComboBox.SelectedItem.ToString());
@@ -375,18 +432,20 @@ namespace PTO_Emailer
         private void EmailsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             int i = 1;
-            int empCount = employees.Count;
-            foreach (EmployeeData employee in employees)
+            int LastGroupStartNum = StartNumber;
+            foreach (EmployeeData employee in employees.GetRange(StartNumber - 1, employees.Count - (StartNumber - 1)))
             {
+                Console.WriteLine("Creating email number " + (StartNumber + i - 1) + " for " + employee.FullName);
                 //Thread.Sleep(100); //simulating work for testing purposes
                 CreateEmail(employee);
                 if (i % 10 == 0)
                 {
-                    MessageBox.Show("Currently working on emails for employees " + (i - 9) + 
-                        " through " + i + " out of " + empCount + " total.");
+                    MessageBox.Show("Currently working on emails " + LastGroupStartNum + 
+                        " through " + (StartNumber + i - 1) + " out of " + employees.Count + " total.");
+                    LastGroupStartNum = StartNumber + i;
                 }
                 i++;
-                emailsBackgroundWorker.ReportProgress((int)((double)i / (double)empCount * 100));
+                emailsBackgroundWorker.ReportProgress((int)((double)i / (double)(employees.Count - StartNumber) * 100));
             }
         }
 
