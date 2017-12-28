@@ -13,7 +13,7 @@
                       AllowsTransparency="True"
                       Title="PTO Emailer" 
                       Height="350"
-                      MinHeight="200"
+                      MinHeight="300"
                       Width="525"
                       MinWidth="450">
     <Window.TaskbarItemInfo>

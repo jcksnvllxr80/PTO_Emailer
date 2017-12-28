@@ -42,8 +42,8 @@ namespace PTO_Emailer
         {
             public int Num { set; get; }
             public string Name { set; get; }
-            public string Vaca { set; get; }
-            public string Sick { set; get; }
+            public double Vaca { set; get; }
+            public double Sick { set; get; }
         }
 
 
@@ -297,8 +297,8 @@ namespace PTO_Emailer
                 {
                     Num = i++,
                     Name = employee.FullName,
-                    Vaca = employee.Vacation,
-                    Sick = employee.Sick
+                    Vaca = double.Parse(employee.Vacation),
+                    Sick = double.Parse(employee.Sick)
                 });
             }
         }
