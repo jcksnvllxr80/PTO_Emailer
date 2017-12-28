@@ -28,19 +28,22 @@ namespace PTO_Emailer
         string applicationMessage = "";
 
 
-        public struct EmployeeDataStruct
-        {
-            public string Name { set; get; }
-            public string Vaca { set; get; }
-            public string Sick { set; get; }
-        }
-
-
         public MainWindow()
         {
             InitializeComponent();
             InitializeBackgroundWorker();
             InitializeDatagrid();
+
+            this.AllowsTransparency = true;
+        }
+
+
+        public struct EmployeeDataStruct
+        {
+            public int Num { set; get; }
+            public string Name { set; get; }
+            public string Vaca { set; get; }
+            public string Sick { set; get; }
         }
 
 
@@ -55,16 +58,23 @@ namespace PTO_Emailer
 
         private void InitializeDatagrid()
         {
+            DataGridTextColumn NumCol = new DataGridTextColumn();
             DataGridTextColumn NameCol = new DataGridTextColumn();
             DataGridTextColumn VacaCol = new DataGridTextColumn();
             DataGridTextColumn SickCol = new DataGridTextColumn();
+
+            EmployeeDataGrid.Columns.Add(NumCol);
             EmployeeDataGrid.Columns.Add(NameCol);
             EmployeeDataGrid.Columns.Add(VacaCol);
             EmployeeDataGrid.Columns.Add(SickCol);
+
+            NumCol.Binding = new Binding("Num");
             NameCol.Binding = new Binding("Name");
             VacaCol.Binding = new Binding("Vaca");
             SickCol.Binding = new Binding("Sick");
-            NameCol.Header = "EmployeeName";
+
+            NumCol.Header = "Num";
+            NameCol.Header = "Employee Name";
             VacaCol.Header = "Vacation";
             SickCol.Header = "Sick";
         }
@@ -118,7 +128,7 @@ namespace PTO_Emailer
         {
             if (file.Substring(file.Length - 3).ToUpper() == "XML")
             {
-                //pass
+                //Pass
             }
             else if (file.Substring(file.Length - 3).ToUpper() == "XLS")
             {
@@ -127,18 +137,21 @@ namespace PTO_Emailer
             }
             else
             {
+                StatusLabel.Text = "Invalid file.";
                 MessageBox.Show("Not a valid filetype. Please try again.");
                 return;
             }
+            DropFileHereLabel.Visibility = Visibility.Hidden;
+
             //clear any old data
+            StatusLabel.Text = "";
             employees.Clear();
             EmployeeDataGrid.Items.Clear();
             EmployeeComboBox.Items.Clear();
 
             CheckFileForErroneousData(file);
             ReadVacationXML(file);
-            BindEmployeeDataToComboBox();
-            BindEmployeeDataToGrid();
+            BindEmployeeDataToControls();
             EnableControls();
         }
 
@@ -169,6 +182,7 @@ namespace PTO_Emailer
         private void EnableControls()
         {
             CreateMailingsTab.Visibility = Visibility.Visible;
+            CreateMailingsTab.IsSelected = true;
             MailButton.Visibility = Visibility.Visible;
             EmployeeComboBox.Visibility = Visibility.Visible;
             EmployeesDataTab.Visibility = Visibility.Visible;
@@ -183,7 +197,7 @@ namespace PTO_Emailer
             xmlDoc.Load(file);
             XmlNodeList Rows = xmlDoc.GetElementsByTagName("Row");
             string balanceColumn = "";
-            int i = 1;
+
             EmployeeData emp = new EmployeeData();
 
             foreach (XmlNode row in Rows)
@@ -222,7 +236,6 @@ namespace PTO_Emailer
                         balanceColumn = XmlParser.FindColumnContainingText(row, "Balance");
                     }
                 }
-                i++;
             }
         }
 
@@ -234,7 +247,6 @@ namespace PTO_Emailer
             string[] strArray = charStr.Split('#');
             bool onesDigitIndex = false;
 
-            int i = 1;
             foreach (string str in strArray)
             {
                 if (str.Contains("."))
@@ -258,17 +270,16 @@ namespace PTO_Emailer
                         onesDigitIndex = false;
                     }
                 }
-                catch
+                catch //(System.Exception e)
                 {
                     //Console.WriteLine(e.ToString());
                 }
-                i++;
             }
             return convertedStr;
         }
 
 
-        private void BindEmployeeDataToComboBox()
+        private void BindEmployeeDataToControls()
         {
             ComboBoxItem myFirstItem = new ComboBoxItem
             {
@@ -277,18 +288,14 @@ namespace PTO_Emailer
             };
             EmployeeComboBox.Items.Add(myFirstItem);
 
+            int i = 1;
             foreach (EmployeeData employee in employees)
             {
-                EmployeeComboBox.Items.Add(employee.FullName);
-            }
-        }
+                EmployeeComboBox.Items.Add(employee.FullName); // add employee to combobox
 
-        private void BindEmployeeDataToGrid()
-        {
-            foreach (EmployeeData employee in employees)
-            {
-                EmployeeDataGrid.Items.Add(new EmployeeDataStruct
+                EmployeeDataGrid.Items.Add(new EmployeeDataStruct // add employee to datagrid
                 {
+                    Num = i++,
                     Name = employee.FullName,
                     Vaca = employee.Vacation,
                     Sick = employee.Sick
@@ -343,6 +350,7 @@ namespace PTO_Emailer
                 applicationMessage = "Creating Mail Items...";
                 EmployeeComboBox.IsEnabled = false;
                 MailButton.IsEnabled = false;
+                OpenMenuItem.IsEnabled = false;
                 DefaultDirectoryMenuItem.IsEnabled = false;
 
                 ProgressBar.Visibility = Visibility.Visible;
@@ -396,11 +404,11 @@ namespace PTO_Emailer
             MailButton.IsEnabled = true;
             OpenMenuItem.IsEnabled = true;
             DefaultDirectoryMenuItem.IsEnabled = true;
+            applicationMessage = "";
 
             ProgressBar.Value = 100;
             ProgressBar.Visibility = Visibility.Hidden;
             TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
-            applicationMessage = "";
         }
 
 

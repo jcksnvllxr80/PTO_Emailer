@@ -9,13 +9,13 @@
                       mc:Ignorable="d"
                       AllowDrop="True"
                       Drop="MetroWindow_Drop"
-                      Title="Vacation Email Creator" 
+                      Opacity="0.94"
+                      AllowsTransparency="True"
+                      Title="PTO Emailer" 
                       Height="350"
                       MinHeight="200"
                       Width="525"
-                      MinWidth="450"
-                      AllowsTransparency="True"
-                      Opacity="0.94">
+                      MinWidth="450">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo/>
     </Window.TaskbarItemInfo>
@@ -51,17 +51,26 @@
                           Click="BrowseForFolder"/>
             </MenuItem>
         </Menu>
-        <TabControl Grid.Row="1"
+        <TabControl x:Name="Tabs" 
+                    Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
-                    TabStripPlacement="Top"
-                    x:Name="Tabs" >
+                    TabStripPlacement="Top">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabPanel}">
                     <Setter Property="Background" 
                             Value="#FFFFFF"/>
                 </Style>
             </TabControl.Resources>
+            <Label x:Name="DropFileHereLabel"
+                   Content="Drop File Here"
+                   Grid.Row="1"
+                   Grid.RowSpan="5"
+                   Grid.Column="1"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   FontSize="38"
+                   Foreground="LightBlue"/>
             <TabItem x:Name="CreateMailingsTab" 
                      Header="Mailings" 
                      Visibility="Collapsed">
